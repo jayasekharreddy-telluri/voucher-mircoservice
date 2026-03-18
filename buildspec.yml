@@ -36,4 +36,5 @@ phases:
 
 artifacts:
   files:
-    - target/*.jar
+    - target/*.jar 
+    
