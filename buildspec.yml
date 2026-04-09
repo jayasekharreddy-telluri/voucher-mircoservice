@@ -16,15 +16,18 @@ phases:
     commands:
       - echo "Logging in to Docker Hub"
       - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
       - echo "Starting local MySQL container for testing"
       - docker run --name test-mysql -e MYSQL_ROOT_PASSWORD=test1234 -e MYSQL_DATABASE=mydb -p 3306:3306 -d mysql:8
-      - sleep 20  # wait for DB to initialize
-      - echo "MySQL is up"
+
+      - echo "Waiting for MySQL..."
+      - sleep 20
 
   build:
     commands:
       - echo "Build phase started"
       - mvn clean install
+
       - echo "Building Docker image"
       - docker build -t $DOCKER_USERNAME/voucher-service:latest .
 
@@ -32,9 +35,14 @@ phases:
     commands:
       - echo "Pushing Docker image"
       - docker push $DOCKER_USERNAME/voucher-service:latest
+
+      - echo "Making scripts executable"
+      - chmod +x scripts/*.sh
+
       - echo "Build completed successfully"
 
 artifacts:
   files:
-    - target/*.jar 
-     
+    - appspec.yml
+    - scripts/**/*
+    - Dockerfile
